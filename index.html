@@ -2,40 +2,38 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Download Assinatura</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; margin: 0; }
-        #capture-area { background: white; padding: 0; display: inline-block; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; margin: 0; }
+        #capture { background: white; display: inline-block; }
+        .msg { margin-bottom: 20px; color: #333; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="msg">Iniciando download...</div>
-    <div id="capture-area"></div>
+    <div id="status" class="msg">Gerando sua assinatura...</div>
+    <div id="capture"></div>
 
     <script>
         window.onload = function() {
-            const params = new URLSearchParams(window.location.search);
-            let content = params.get('content');
+            const urlParams = new URLSearchParams(window.location.search);
+            const htmlContent = urlParams.get('content');
 
-            if (content) {
-                // Tenta decodificar de Base64 se necessário
-                try {
-                    if (!content.includes('<')) { content = atob(content); }
-                } catch(e) { console.log("Lendo como HTML comum"); }
+            if (htmlContent) {
+                const area = document.getElementById('capture');
+                area.innerHTML = decodeURIComponent(htmlContent);
 
-                const container = document.getElementById('capture-area');
-                container.innerHTML = decodeURIComponent(content);
-
+                // Pequena pausa para garantir que o navegador renderizou o texto
                 setTimeout(() => {
-                    html2canvas(container, { scale: 2, useCORS: true }).then(canvas => {
+                    html2canvas(area, { scale: 2, useCORS: true }).then(canvas => {
                         const link = document.createElement('a');
                         link.download = 'assinatura_sipal.png';
                         link.href = canvas.toDataURL("image/png");
                         link.click();
-                        document.getElementById('msg').innerText = "Download Concluído!";
+                        document.getElementById('status').innerText = "Download concluído!";
                     });
                 }, 1000);
+            } else {
+                document.getElementById('status').innerText = "Aguardando dados...";
             }
         };
     </script>
