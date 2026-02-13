@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversor Power Apps para PNG</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; }
+        #capture-area { background: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 4px 10px rgba(0,0,0,0.1); min-width: 500px; }
+        .loading { color: #555; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="loading-msg" class="loading">Processando sua imagem...</div>
+    
+    <div id="capture-area"></div>
+
+    <script>
+        window.onload = function() {
+            // 1. Pegar o conteúdo da URL (parâmetro 'content')
+            const urlParams = new URLSearchParams(window.location.search);
+            const htmlContent = urlParams.get('content');
+
+            if (htmlContent) {
+                const container = document.getElementById('capture-area');
+                // Decodifica o conteúdo vindo da URL e injeta no HTML
+                container.innerHTML = decodeURIComponent(htmlContent);
+
+                // 2. Aguardar as fontes/imagens carregarem e gerar o PNG
+                setTimeout(() => {
+                    html2canvas(container, { 
+                        scale: 2, // Aumenta a resolução do PNG
+                        useCORS: true 
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = 'documento_powerapps.png';
+                        link.href = canvas.toDataURL("image/png");
+                        link.click();
+                        document.getElementById('loading-msg').innerText = "Download Concluído!";
+                    });
+                }, 1000); // 1 segundo de folga para renderizar tudo
+            } else {
+                document.getElementById('loading-msg').innerText = "Nenhum dado recebido do Power Apps.";
+            }
+        };
+    </script>
+</body>
+</html>
