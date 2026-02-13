@@ -5,41 +5,37 @@
     <title>Download Assinatura</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; margin: 0; }
-        #capture-area { background: white; border: none; }
-        .status { color: #555; font-weight: bold; margin-bottom: 10px; }
+        body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; margin: 0; }
+        #capture-area { background: white; padding: 0; display: inline-block; }
     </style>
 </head>
 <body>
-    <div id="msg" class="status">Preparando seu arquivo...</div>
+    <div id="msg">Iniciando download...</div>
     <div id="capture-area"></div>
 
     <script>
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
-            const content = params.get('content');
+            let content = params.get('content');
 
             if (content) {
+                // Tenta decodificar de Base64 se necessário
+                try {
+                    if (!content.includes('<')) { content = atob(content); }
+                } catch(e) { console.log("Lendo como HTML comum"); }
+
                 const container = document.getElementById('capture-area');
                 container.innerHTML = decodeURIComponent(content);
 
-                // Aguarda as fontes e imagens carregarem (1.5 segundos)
                 setTimeout(() => {
-                    html2canvas(container, { 
-                        scale: 2, 
-                        useCORS: true, 
-                        allowTaint: true,
-                        logging: false 
-                    }).then(canvas => {
+                    html2canvas(container, { scale: 2, useCORS: true }).then(canvas => {
                         const link = document.createElement('a');
-                        link.download = 'assinatura_email.png';
+                        link.download = 'assinatura_sipal.png';
                         link.href = canvas.toDataURL("image/png");
                         link.click();
                         document.getElementById('msg').innerText = "Download Concluído!";
                     });
-                }, 1500);
-            } else {
-                document.getElementById('msg').innerText = "Aguardando dados do Power Apps...";
+                }, 1000);
             }
         };
     </script>
