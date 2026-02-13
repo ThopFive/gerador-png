@@ -12,35 +12,28 @@
 </head>
 <body>
     <div id="loading-msg" class="loading">Processando sua imagem...</div>
-    
     <div id="capture-area"></div>
 
     <script>
         window.onload = function() {
-            // 1. Pegar o conteúdo da URL (parâmetro 'content')
             const urlParams = new URLSearchParams(window.location.search);
             const htmlContent = urlParams.get('content');
 
             if (htmlContent) {
                 const container = document.getElementById('capture-area');
-                // Decodifica o conteúdo vindo da URL e injeta no HTML
                 container.innerHTML = decodeURIComponent(htmlContent);
 
-                // 2. Aguardar as fontes/imagens carregarem e gerar o PNG
                 setTimeout(() => {
-                    html2canvas(container, { 
-                        scale: 2, // Aumenta a resolução do PNG
-                        useCORS: true 
-                    }).then(canvas => {
+                    html2canvas(container, { scale: 2, useCORS: true }).then(canvas => {
                         const link = document.createElement('a');
                         link.download = 'documento_powerapps.png';
                         link.href = canvas.toDataURL("image/png");
                         link.click();
                         document.getElementById('loading-msg').innerText = "Download Concluído!";
                     });
-                }, 1000); // 1 segundo de folga para renderizar tudo
+                }, 1000);
             } else {
-                document.getElementById('loading-msg').innerText = "Nenhum dado recebido do Power Apps.";
+                document.getElementById('loading-msg').innerText = "Aguardando dados...";
             }
         };
     </script>
